@@ -30,8 +30,6 @@ url: https://techover-io.github.io/swift.guildline
 github_username: techover-io
 
 # Build settings
-plugins:
-  - jekyll-default-layout
 
 # Exclude from processing.
 # The following items will not be processed, by default.
