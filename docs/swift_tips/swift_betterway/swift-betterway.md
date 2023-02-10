@@ -44,7 +44,9 @@ for case let obj as ClassA in listObjs {
 ```
 
 Note: khi test thử thì cách bên trên có performance tốt hơn, code chạy xong nhanh hơn tuy nhiên không đáng kể.
-Sample: [sample.swift](sample-forcase.swift)  
+Sample: [sample.swift](sample-forcase.swift)
+
+Note: Update 2023, cách bên dưới đã nhanh hơn. XCode 14.2, swift 5.7.2, Apple M1
 
 ## `enumerated()`  
 
