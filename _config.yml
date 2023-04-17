@@ -18,9 +18,9 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 
-title: TechOver.io's Swift Guildline
+title: NhatHM's Swift Guildline
 email: nhathm01247@gmail.com
-description: techover
+description: nhathm
 theme: just-the-docs
 
 url: https://nhathm.github.io/
@@ -48,8 +48,6 @@ github_username: nhathm
 #   - vendor/cache/
 #   - vendor/gems/
 #   - vendor/ruby/
-
-logo: "/docs/assets/images/logo-gst.ico"
 
 search_enabled: true
 
