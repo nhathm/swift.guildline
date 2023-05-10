@@ -7,6 +7,12 @@ nav_order: 4
 
 Trong SwiftUI thì có sử dụng khái niệm **single *source of truth***
 
+## Table of contents
+{: .no_toc }
+
+1. TOC
+{:toc}
+
 ## Managing user interface
 
 Trong trường hợp cần sử dụng data trong nội bộ của View, thường là data dùng để hiển thị lên View hoặc trong các View có mối liên hệ với nhau, thì sử dụng State, StateObject hoặc Binding (gọi là Property Wrapper).
@@ -73,8 +79,7 @@ Ví dụ chúng ta có 2 view là `ParentView` và `ChildView`, với `ChildView
 
 > Bổ sung sample source cho ví dụ này.
 
-**Share an object throughout app**
-
+**Share an object throughout app**  
 Khi muốn share data xuyên suốt app, hoặc loại data mà có thể sử dụng ở nhiều màn hình, tuy nhiên các màn hình đấy không liên tục nhau, dẫn đến việc transfer data giữa các màn hình trở nên khó khăn (ví dụ data dùng ở màn hình A, D, trong khi flow màn hình là A -> B -> C -> D thì việc transfer data qua 2 màn hình không liên quan là B, C trở nên bất hợp lý) thì có thể cân nhắc việc sử dụng `@EnvironmentObject`.
 
 Có thể suy nghĩ đến các trường hợp như Application State (dùng để quản lý trạng thái của app, các stack của flow màn hình) hoặc User State để lưu trữ data trạng thái của User, config của User, thì có thể sử dụng `@EnvironmentObject`.
@@ -82,7 +87,7 @@ Có thể suy nghĩ đến các trường hợp như Application State (dùng đ
 Cách sử dụng:
 
 Với data model sử dụng để làm Environment Object thì chỉ cần conform to protocol `ObservableObject`.
-
+ 
 ```swift
 final class UserState: ObservableObject {
     @Published var loginState: UserLoginState = .notLoggedIn
@@ -134,3 +139,26 @@ Có một vài lưu ý khi dùng Environment Object như sau
 - Về cơ bản thì vòng đời của environment object khá là dài, và nó sẽ consume data liên tục trong suốt vòng đời của app, nên việc sử dụng nó sẽ tăng memory -> không lạm dụng environment object khi không thực sự cần thiết
 - Environment Object được dùng ở toàn app hoặc trong một phạm vi khá lớn, dẫn đến việc rất dễ xảy ra sai sót logic do nhiều màn hình cùng sử dụng chung một data. Vì vậy khi dùng Environment Object cần phải review kỹ logic tránh sai sót.
 - Environment Object nếu chưa được inject vào app thông qua modifier environmentObject() thì nếu sử dụng app sẽ bị crash.
+
+## Environment values
+
+`Environment` property wrapper dùng để đọc các giá trị của view, thuộc các group như `Accessibility`, `Actions`, `Authentication`, `Controls and input`, `Display characteristics`, `Global objects`, `Scrolling`, `State`, `StoreKit configuration`, `Text styles`, `View attributes`, `Widgets`. Các giá trị này cung cấp thông tin về config của view hoặc của app, thông qua đó có thử xử lý UI hay logic một cách phù hợp.
+
+Sử dụng `Environment` để đọc các thông tin như Core Data managed object, color scheme, light mode / dark mode, calendar, locale, time zone, trạng thái edit của view, text styles...
+
+Syntax:
+
+```swift
+@Environment(\.colorScheme) var colorScheme: ColorScheme
+
+if colorScheme == .dark { // Checks the wrapped value.
+    DarkContent()
+} else {
+    LightContent()
+}
+```
+
+Nếu value thay đổi `colorScheme` thì các phần view liên quan đến `colorScheme` sẽ được update.  
+Các `Environment` property thường là read-only với value được set bởi SwiftUI, đối với những `Environtment` property mà có thể thay đổi được thì có thể sử view modifier [`environment(_:_:)`](https://developer.apple.com/documentation/swiftui/view/environment(_:_:))
+
+Có thể tham khảo danh sách Environment Values đầy đủ tại [EnvironmentValues](https://developer.apple.com/documentation/swiftui/environmentvalues).
