@@ -228,3 +228,7 @@ struct MyChildView: View {
 ```
 
 Trong ví dụ này, khi user tap button `Touch Me` thì preference value sẽ thay đổi, khi đó child view sẽ gửi preference value đi và parent view sẽ nhận được, sau đó update lên UI.
+
+Result:
+
+![before tap button](./swiftui_data_and_storage_resources/Preferences_1.png) ![after tap button](./swiftui_data_and_storage_resources/Preferences_2.png)
