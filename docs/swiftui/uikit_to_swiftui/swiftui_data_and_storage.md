@@ -162,3 +162,69 @@ Nếu value thay đổi `colorScheme` thì các phần view liên quan đến `c
 Các `Environment` property thường là read-only với value được set bởi SwiftUI, đối với những `Environtment` property mà có thể thay đổi được thì có thể sử view modifier [`environment(_:_:)`](https://developer.apple.com/documentation/swiftui/view/environment(_:_:))
 
 Có thể tham khảo danh sách Environment Values đầy đủ tại [EnvironmentValues](https://developer.apple.com/documentation/swiftui/environmentvalues).
+
+Một vài điểm lưu ý:
+
+- SwiftUI sẽ tự động tạo Environment cho View, và apply các Environment setting cho tất cả child view tự động.
+- Child view có thể override lại environment setting thông qua environment modifier `environment`.
+
+## Preferences
+
+`Preferences` là phương pháp truyền data từ child view lên parens view hoặc view cấp cao hơn mà không cần gửi data qua từng view trung gian (tương tự Environment là từ trên xuống, còn Preferences là từ dưới lên).
+
+Child view sẽ lưu các thông tin sử dụng preference key, data này có thể được lấy ra bởi các parent views, hoặc view cấp cao hơn thông qua preference key. Các thông tin có thể sử dụng Preferences để gửi nhận như thông tin về layout, thông tin về kích thước view, các data đơn giản như string title.
+
+Để sử dụng Preferences thì cần define các preference key mà conform đến protocol `PreferenceKey`. PreferenceKey protocol sẽ define cách mà data kết hợp với nhau khi mà có nhiều views gửi data với key giống nhau.
+
+Để set preference value ở child view thì sử dụng preference modifier. Preference value là kiểu data mà phải conform đến protocol `Equatable`. Trong view cấp trên thì sử dụng `onPreferenceChange` modifier để lắng nghe sự thay đổi của preference value và update view tương ứng.
+
+Sample source
+
+Đầu tiên, để Preferences có thể hoạt động thì cần phải có Preference Key implementation
+
+```swift
+struct ChildViewDataKey: PreferenceKey {
+    static var defaultValue: String = ""
+
+    static func reduce(value: inout String, nextValue: () -> String) {
+        value = nextValue()
+    }
+}
+```
+
+Ở ví dụ này thì preference key xử lý logic khi có nhiều preference được bắn từ view con thì view cấp trên sẽ lấy value mới nhất. Ngoài ra có thể xử lý logic phức tạp hơn tùy thuộc vào nhu cầu bài toán.
+
+Parent View
+
+```swift
+struct MyParentView: View {
+    @State var myPreferenceValue: String = ""
+
+    var body: some View {
+        VStack {
+            Text("Parent View")
+            Text(myPreferenceValue)
+            MyChildView().background(Color.gray)
+        }.onPreferenceChange(ChildViewDataKey.self) { value in
+            myPreferenceValue = value
+        }
+    }
+}
+```
+
+Child View
+
+```swift
+struct MyChildView: View {
+    @State var myPreferenceValue = "Initial Value"
+
+    var body: some View {
+        Text("Child View")
+        Button("Touch Me") {
+            myPreferenceValue = "New Preference Value"
+        }.preference(key: ChildViewDataKey.self, value: myPreferenceValue)
+    }
+}
+```
+
+Trong ví dụ này, khi user tap button `Touch Me` thì preference value sẽ thay đổi, khi đó child view sẽ gửi preference value đi và parent view sẽ nhận được, sau đó update lên UI.
