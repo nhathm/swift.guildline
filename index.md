@@ -2,7 +2,7 @@
 layout: default
 title: Home
 nav_order: 1
-description: "Swift & iOS Guildline. Coding convention, "
+description: "Swift & iOS"
 permalink: /
 ---
 

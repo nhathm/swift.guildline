@@ -8,6 +8,7 @@ nav_order: 4
 Trong SwiftUI thì có sử dụng khái niệm **single *source of truth***
 
 ## Table of contents
+
 {: .no_toc }
 
 1. TOC
@@ -87,7 +88,7 @@ Có thể suy nghĩ đến các trường hợp như Application State (dùng đ
 Cách sử dụng:
 
 Với data model sử dụng để làm Environment Object thì chỉ cần conform to protocol `ObservableObject`.
- 
+
 ```swift
 final class UserState: ObservableObject {
     @Published var loginState: UserLoginState = .notLoggedIn
@@ -162,3 +163,133 @@ Nếu value thay đổi `colorScheme` thì các phần view liên quan đến `c
 Các `Environment` property thường là read-only với value được set bởi SwiftUI, đối với những `Environtment` property mà có thể thay đổi được thì có thể sử view modifier [`environment(_:_:)`](https://developer.apple.com/documentation/swiftui/view/environment(_:_:))
 
 Có thể tham khảo danh sách Environment Values đầy đủ tại [EnvironmentValues](https://developer.apple.com/documentation/swiftui/environmentvalues).
+
+Một vài điểm lưu ý:
+
+- SwiftUI sẽ tự động tạo Environment cho View, và apply các Environment setting cho tất cả child view tự động.
+- Child view có thể override lại environment setting thông qua environment modifier `environment`.
+
+## Preferences
+
+`Preferences` là phương pháp truyền data từ child view lên parens view hoặc view cấp cao hơn mà không cần gửi data qua từng view trung gian (tương tự Environment là từ trên xuống, còn Preferences là từ dưới lên).
+
+Child view sẽ lưu các thông tin sử dụng preference key, data này có thể được lấy ra bởi các parent views, hoặc view cấp cao hơn thông qua preference key. Các thông tin có thể sử dụng Preferences để gửi nhận như thông tin về layout, thông tin về kích thước view, các data đơn giản như string title.
+
+Để sử dụng Preferences thì cần define các preference key mà conform đến protocol `PreferenceKey`. PreferenceKey protocol sẽ define cách mà data kết hợp với nhau khi mà có nhiều views gửi data với key giống nhau.
+
+Để set preference value ở child view thì sử dụng preference modifier. Preference value là kiểu data mà phải conform đến protocol `Equatable`. Trong view cấp trên thì sử dụng `onPreferenceChange` modifier để lắng nghe sự thay đổi của preference value và update view tương ứng.
+
+Sample source
+
+Đầu tiên, để Preferences có thể hoạt động thì cần phải có Preference Key implementation
+
+```swift
+struct ChildViewDataKey: PreferenceKey {
+    static var defaultValue: String = ""
+
+    static func reduce(value: inout String, nextValue: () -> String) {
+        value = nextValue()
+    }
+}
+```
+
+Ở ví dụ này thì preference key xử lý logic khi có nhiều preference được bắn từ view con thì view cấp trên sẽ lấy value mới nhất. Ngoài ra có thể xử lý logic phức tạp hơn tùy thuộc vào nhu cầu bài toán.
+
+Parent View
+
+```swift
+struct MyParentView: View {
+    @State var myPreferenceValue: String = ""
+
+    var body: some View {
+        VStack {
+            Text("Parent View")
+            Text(myPreferenceValue)
+            MyChildView().background(Color.gray)
+        }.onPreferenceChange(ChildViewDataKey.self) { value in
+            myPreferenceValue = value
+        }
+    }
+}
+```
+
+Child View
+
+```swift
+struct MyChildView: View {
+    @State var myPreferenceValue = "Initial Value"
+
+    var body: some View {
+        Text("Child View")
+        Button("Touch Me") {
+            myPreferenceValue = "New Preference Value"
+        }.preference(key: ChildViewDataKey.self, value: myPreferenceValue)
+    }
+}
+```
+
+Trong ví dụ này, khi user tap button `Touch Me` thì preference value sẽ thay đổi, khi đó child view sẽ gửi preference value đi và parent view sẽ nhận được, sau đó update lên UI.
+
+Result:
+
+![before tap button](./swiftui_data_and_storage_resources/Preferences_1.png) ![after tap button](./swiftui_data_and_storage_resources/Preferences_2.png)
+
+## Persistent storage
+
+SwiftUI cung cấp một vài property wrapper để view có thể lưu trữ data như `@AppStorage`, `@SceneStorage` và `@FetchRequest` của Core Data.
+
+**@AppStorage**  
+`@AppStorage` là property cho phép view lưu và ghi dữ liệu trực tiếp vào UserDefauls. Khi value của key tương ứng thay đổi trong UserDefaults thì UI sẽ được refresh, ngược lại khi data trên view thay đổi thì data đó sẽ được sync xuống UserDefaults ngay lập tức.
+
+Vì `@AppStorage` bản chất là được lưu ở User Default standard (`UserDefaults.standard`), nên chúng ta cần hiểu rằng data được lưu bởi property wrapper này sẽ không được bảo mật, ngoài ra thì việc trùng key với các phần lưu User Default trong  logic của app là có thể xảy ra, nên cần lưu ý khi đặt tên cho key.
+
+Source sample:
+
+```swift
+struct ContentView: View {
+    @AppStorage("HomeScreenUserName") var username: String = "nhathm"
+
+    ...
+}
+```
+
+Trong một vài trường hợp, có thể sử dụng group user default khác để lưu data cho view.
+
+```swift
+    @AppStorage("HomeScreenUserName", store: UserDefaults(suiteName: "group.com.nhathm.sample")) var username: String = "nhathm"
+```
+
+> Note: suiteName cho phép app chia sẻ content giữa các apps với nhau hoặc với extensions mà có chung App Group. Phân biệt bởi suite name.
+
+Về cơ bản thì data được lưu trong user default nên khi quit app bật lại thì data vẫn được lưu trữ. Và các kiểu data có thể lưu trữ khá cơ bản, cần phải có thể encode và decode được.
+
+**@SceneStorage**  
+Scene Storage là  property wrapper dùng để lưu trữ các dạng lightweight data, nhằm mục đích restore lại data trên app khi app bị quit vì lý do nào đó.
+
+Ví dụ dùng để lưu trữ data user đang nhập liệu trong màn hình: nhập thông tin / gửi request / note...mà có cuộc gọi đến, hoặc user switch sang chơi game, thì có thể app sẽ bị suspended, hoặc app bị crash. Lúc này nếu sử dụng Scene Storage thì khi bật lại app, có thể restore lại data mà user đang nhập.
+
+Lưu ý rằng nếu user quit app thông qua multi tasking thì data lưu trong Scene Storage cũng sẽ bị xóa.
+
+Sample source:
+
+```swift
+struct NoteView: View {
+    @SceneStorage("NoteView.todayNote") var text = ""
+
+    var body: some View {
+        TextEditor(text: $text)
+    }
+}
+```
+
+Không được lưu trữ data phức tạp, chỉ lưu trữ data cho mục đích restoration
+Data quan trọng cũng không được lưu trong Scene Storage
+Nếu app có nhiều Scene (app iPad, macOS) thì data của từng Scene sẽ khác nhau
+Trong trường hợp muốn lưu trữ custom type data thì cần phải implement để struct đó có thể Codeable được, encode và decode data sử dụng JSONEncoder/JSONDecoder và conform to `RawRepresentable` protocol
+Sample: <https://useyourloaf.com/blog/scenestorage-for-custom-types/>
+
+**CoreData**  
+SwiftUI cũng hỗ trợ View access thẳng xuống Core Data để lưu và nhận data.
+Tuy nhiên, với quan điểm cá nhân thì view nên tách biệt khỏi các loại data cần setup như core data để đảm bảo việc tái sử dụng view một cách dễ dàng, nên Core data sẽ không được đề cập trong bài viết này.
+
+Với các dạng màn hình cần lưu trữ data dạng cache như search result thì thay vì sử dụng core data, hãy sử dụng view model.
