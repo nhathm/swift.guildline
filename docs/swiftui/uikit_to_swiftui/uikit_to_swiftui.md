@@ -14,7 +14,7 @@ SwiftUI sẽ không còn khái niệm ViewController mà thay thế bằng View,
 
 | UIKit                   | SwiftUI | Note |
 | :---                    | :---      | :--- |
-| UILabel                 | Text, Label     | Text thì tương tự label bên UIKit, còn Label thì có thể hiển thị text và image cạnh nhau    |
+| 1. UILabel                 | Text, Label     | Text thì tương tự label bên UIKit, còn Label thì có thể hiển thị text và image cạnh nhau    |
 | UITabbar                | TabView       |       |
 | UITabBarItem            |TabView| .tabItem của TabView |
 | UITextField             | TextField | (isSecureTextEntry) -> SecureField |
@@ -30,7 +30,7 @@ SwiftUI sẽ không còn khái niệm ViewController mà thay thế bằng View,
 | UIActivityIndicatorView | ProgressView | CircularProgressViewStyle |
 | UIImageView             | Image |       |
 | UIPickerView            | Picker |       |
-| UIButton                | Button, Link | Link sẽ mở app khác hoặc default web browser |
+| 17. UIButton            | [Button, Link](/docs/swiftui_components/swiftui_buttons/swiftui_button_index.html) | Link sẽ mở app khác hoặc default web browser |
 | UIDatePicker            | DatePicker |       |
 | UIPageControl           | TabView | PageTabViewStyle style, .indexViewStyle |
 | UIProgressView          | ProgressView |       |

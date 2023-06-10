@@ -6,20 +6,16 @@ nav_order: 1
 has_toc: true
 ---
 
-# Navigation Structure
-
+# OWASP Top 10 for Mobile  
 {: .no_toc }
 
-## Table of contents
-
+## Table of contents  
 {: .no_toc .text-delta }
 
 1. TOC
 {:toc}
 
 [**OWASP (Open Web Application Security Project)**](https://owasp.org/) là dự án xây dựng một nền tảng hướng đến việc tăng cường bảo mật cho phần mềm. Bắt nguồn là cho các dự án Web app, Back end. Tuy nhiên hiện nay thì bảo mật cho các dự án Mobile cũng đã trở nên cấp thiết hơn rất nhiều, và series bài viết này sẽ hướng đến tìm hiểu về các vấn đề về security, phương thức tấn công, các phương pháp phòng tránh, các checklist để tạo ra một project mobile an toàn hơn.
-
-## OWASP Top 10 for Mobile
 
 ### 1. Improper Platform Usage
 

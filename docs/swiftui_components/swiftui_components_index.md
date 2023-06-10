@@ -1,6 +1,6 @@
 ---
 layout: default
-title: WWDC21 Notes
-# nav_order: 6
+title: SwiftUI's Components
+nav_order: 3
 has_children: true
 ---

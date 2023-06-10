@@ -10,4 +10,4 @@ permalink: /
 
 - [nhathm](https://github.com/nhathm){:target="_blank"}  
 
-**[Main Page](https://techover.io/)**
+**[Main Page](https://nhathm.com/)**
