@@ -8,7 +8,6 @@ nav_order: 4
 Trong SwiftUI thì có sử dụng khái niệm **single *source of truth***
 
 ## Table of contents
-
 {: .no_toc }
 
 1. TOC
