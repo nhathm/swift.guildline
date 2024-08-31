@@ -8,4 +8,6 @@ source "https://rubygems.org"
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
 gem "jekyll", "~> 4.3"
-gem "just-the-docs"
+gem "just-the-docs", "0.4.0.rc3"
+
+gem "webrick", "~> 1.8"
