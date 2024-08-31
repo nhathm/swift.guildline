@@ -9,3 +9,5 @@ source "https://rubygems.org"
 # Happy Jekylling!
 gem "jekyll", "~> 4.3"
 gem "just-the-docs", "0.4.0.rc3"
+
+gem "webrick", "~> 1.8"
